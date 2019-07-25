@@ -32,7 +32,7 @@ while [[ "$#" -gt 0 ]]; do case $1 in
 esac; shift; done
 
 
-[ "$LIST" ] && { curl -s "$URL/" | grep -Po '(?<=href=")[^"]*' | sort -u; exit; }
+[ "$LIST" ] && { curl -s "$URL/" | grep -Po '(?<=href=")[^"]*'; exit; }
 
 [ "$VER" ] || { usage; exit 1; }
 
