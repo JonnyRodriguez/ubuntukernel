@@ -1,0 +1,48 @@
+#!/bin/bash
+URL="https://kernel.ubuntu.com/~kernel-ppa/mainline"
+ARCH='amd64'
+TYPE='generic'
+DIR='temp'
+
+function usage()
+{
+   cat << HEREDOC
+
+   Usage: $0 v4.19.59 [--list] [--show]
+
+   optional arguments:
+     -h, --help           show this help message and exit
+     -s, --show           shows the kernel files
+     -l, --list           list kernel versions available
+     -d, --directory      output directory to download kernel files
+     --dry-run            do a dry run, dont change any files
+
+HEREDOC
+}
+
+while [[ "$#" -gt 0 ]]; do case $1 in
+  -v|--version) VER="$2"; shift;;
+  -a|--arch) ARCH="$2"; shift;;
+  -t|--type) TYPE="$2"; shift;;
+  -d|--directory) DIR="$2"; shift;;
+  -l|--list) LIST=1;;
+  -s|--show) SHOW=1;;
+  -h|--help) usage; exit;;
+  v*) VER="$1";;
+  *) echo "Unknown parameter passed: $1"; exit 1;;
+esac; shift; done
+
+
+[ "$LIST" ] && { curl -s "$URL/" | grep -Po '(?<=href=")[^"]*' | sort -u; exit; }
+
+[ "$VER" ] || { usage; exit 1; }
+
+CONTENT=$(curl -s "$URL/$VER/" | grep -Po '(?<=href=")[^"]*' | sort -u)
+[ "$CONTENT" ] || { echo Incorrect version specified; exit 1; }
+
+FILES=$(echo "$CONTENT" | grep all)$'\n'$(echo "$CONTENT" | grep $ARCH | grep $TYPE)
+[ "$SHOW" ] && { echo "$FILES"; exit; }
+
+WFILES=$(echo "$FILES" | sed "s|^|$URL/$VER/|")
+#WFILES=$(echo "$WFILES" | tr '\n' ' ')
+wget -P $DIR -c $WFILES || exit $?
