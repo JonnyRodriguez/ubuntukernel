@@ -15,6 +15,7 @@ function usage()
      -s, --show           shows the kernel files
      -l, --list           list kernel versions available
      -d, --directory      output directory to download kernel files
+     -i, --install        install downloaded kernel files
 
 HEREDOC
 }
@@ -24,6 +25,7 @@ while [[ "$#" -gt 0 ]]; do case $1 in
   -a|--arch) ARCH="$2"; shift;;
   -t|--type) TYPE="$2"; shift;;
   -d|--directory) DIR="$2"; shift;;
+  -i|--install) INSTALL=1;;
   -l|--list) LIST=1;;
   -s|--show) SHOW=1;;
   -h|--help) usage; exit;;
@@ -45,3 +47,5 @@ FILES=$(echo "$CONTENT" | grep all)$'\n'$(echo "$CONTENT" | grep $ARCH | grep $T
 WFILES=$(echo "$FILES" | sed "s|^|$URL/$VER/|")
 #WFILES=$(echo "$WFILES" | tr '\n' ' ')
 wget -P $DIR -c $WFILES || exit $?
+
+[ "$INSTALL" ] && (dkpg -i $DIR/$FILES || exit $?)
