@@ -15,7 +15,6 @@ function usage()
      -s, --show           shows the kernel files
      -l, --list           list kernel versions available
      -d, --directory      output directory to download kernel files
-     --dry-run            do a dry run, dont change any files
 
 HEREDOC
 }
